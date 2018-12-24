@@ -1,7 +1,7 @@
 package daemon
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/me/authserver/db"
 	"github.com/me/authserver/handler"
@@ -17,14 +17,14 @@ type Config struct {
 
 // Start :
 func Start(cfg *Config) error {
-	fmt.Println("Autorization server on port %s started\n", cfg.ListenSpec)
+	log.Printf("Autorization server on port %s started\n", cfg.ListenSpec)
 
 	db, err := db.InitDb(cfg.Db)
 	if err != nil {
-		fmt.Println("Database connecting error")
+		log.Fatal("Fatal error with conecting or preparing databse")
 		return err
 	} else {
-		fmt.Println("Database connected successful")
+		log.Println("Database connected successful")
 	}
 
 	m := model.New(db)

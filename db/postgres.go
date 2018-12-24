@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"log"
 
 	"github.com/me/authserver/model"
 	//init database drive
@@ -20,14 +21,14 @@ type Config struct {
 func InitDb(cfg Config) (*pgDb, error) {
 	dbConn, err := sql.Open("postgres", cfg.ConnectString)
 	if err != nil {
+		log.Println("Database connecting error")
 		return nil, err
-	} else {
-		p := &pgDb{dbConn: dbConn}
-		if err := p.prepareSQLStatements(); err != nil {
-			return nil, err
-		}
-		return p, nil
 	}
+	p := &pgDb{dbConn: dbConn}
+	if err := p.prepareSQLStatements(); err != nil {
+		return nil, err
+	}
+	return p, nil
 
 }
 
@@ -44,7 +45,7 @@ func (p *pgDb) prepareSQLStatements() (err error) {
 	if p.sqlSelectUser, err = p.dbConn.Prepare(
 		"SELECT username, first_name, last_name, user_type, e_mail FROM users WHERE username=$1 AND password=$2 AND deleted=FALSE",
 	); err != nil {
-		fmt.Println("Error preparing sqlSelectUser")
+		log.Println("Error preparing sqlSelectUser")
 		return err
 	}
 
@@ -52,14 +53,14 @@ func (p *pgDb) prepareSQLStatements() (err error) {
 		"INSERT INTO users (username, first_name, last_name, e_mail ,password)" +
 			"values ($1,$2,$3,$4,$5);",
 	); err != nil {
-		fmt.Println("Error preparing sqlInsertUser")
+		log.Println("Error preparing sqlInsertUser")
 		return err
 	}
 
 	if p.sqlDeleteMarkUser, err = p.dbConn.Prepare(
 		"UPDATE USERS SET DELETED = '1' WHERE username=$1 AND password=$2 AND DELETED=FALSE",
 	); err != nil {
-		fmt.Println("Error preparing sqlDeleteMarkUser")
+		log.Println("Error preparing sqlDeleteMarkUser")
 		return err
 	}
 
@@ -75,10 +76,12 @@ func (p *pgDb) prepareSQLStatements() (err error) {
 
 func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string) (*model.User, error) {
 	passw := sha256.Sum256([]byte(password))
-	if res, err := p.sqlInsertUser.Exec(username, fisrtName, lastName, eMail, hex.EncodeToString(passw[:])); err != nil {
-		fmt.Println(res.LastInsertId())
+	res, err := p.sqlInsertUser.Exec(username, fisrtName, lastName, eMail, hex.EncodeToString(passw[:]))
+	if err != nil {
 		return nil, err
 	}
+	i, err := res.RowsAffected()
+	log.Printf("CreateUser : create %d  row", i)
 	q := &model.User{Username: username, FisrtName: fisrtName, LastName: lastName, UserType: "general", EMail: eMail}
 	return q, nil
 }
@@ -89,33 +92,42 @@ func (p *pgDb) CheckUser(username, password string) (*model.User, error) {
 	err := p.sqlSelectUser.QueryRow(username, hex.EncodeToString(passw[:])).Scan(&user.Username,
 		&user.FisrtName, &user.LastName, &user.UserType, &user.EMail)
 	switch {
-	case err == sql.ErrNoRows:
-		fmt.Println("No user with that ID.")
-		return nil, err
+	/*case err == sql.ErrNoRows:
+	log.Println("CheckUser: No user with that ID.")
+	return nil, err*/
 	case err != nil:
-		fmt.Println("Error in QueryRow")
-		fmt.Println(err)
+		log.Println("CheckUser: Error in QueryRow")
 		return nil, err
 	default:
-		fmt.Printf("Username is %s\n", username)
+		log.Printf("CheckUser: Username is %s\n", username)
 		return user, nil
 	}
 }
 
 func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 	passw := sha256.Sum256([]byte(password))
-	if res, err := p.sqlInsertUser.Exec(username, hex.EncodeToString(passw[:])); err != nil {
-		fmt.Println(res.LastInsertId())
+	res, err := p.sqlInsertUser.Exec(username, hex.EncodeToString(passw[:]))
+	if err != nil {
 		return nil, err
+	}
+	i, err := res.RowsAffected()
+	log.Printf("CreateUser : create %d  row", i)
+	if i == 0 {
+		return nil, nil
 	}
 	return &model.User{Username: username}, nil
 }
 
 func (p *pgDb) PatchUser(username, fisrtName, lastName, eMail, password string) (*model.User, error) {
 	passw := sha256.Sum256([]byte(password))
-	if res, err := p.sqlInsertUser.Exec(fisrtName, lastName, eMail, username, hex.EncodeToString(passw[:])); err != nil {
-		fmt.Println(res.LastInsertId())
+	res, err := p.sqlInsertUser.Exec(fisrtName, lastName, eMail, username, hex.EncodeToString(passw[:]))
+	if err != nil {
 		return nil, err
+	}
+	i, err := res.RowsAffected()
+	log.Printf("CreateUser : create %d  row", i)
+	if i == 0 {
+		return nil, nil
 	}
 	q := &model.User{Username: username, FisrtName: fisrtName, LastName: lastName, UserType: "general", EMail: eMail}
 	return q, nil

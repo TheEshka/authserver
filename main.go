@@ -24,9 +24,10 @@ func processFlags() *daemon.Config {
 func prepareLogFile() {
 	f, err := os.OpenFile("testlogfile.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+		log.Printf("error opening file for logs: %v", err)
 	}
-	defer f.Close()
+	log.SetFlags(log.LstdFlags)
+	//defer f.Close()
 	mw := io.MultiWriter(os.Stdout, f)
 	log.SetOutput(mw)
 }
@@ -37,6 +38,6 @@ func main() {
 	prepareLogFile()
 
 	if err := daemon.Start(cfg); err != nil {
-		fmt.Println("Error in main(): %v", err)
+		fmt.Printf("Error in main(): %v", err)
 	}
 }
