@@ -1,0 +1,37 @@
+version: '3'
+
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.18.238.0/24
+
+        
+services:
+
+  postgres:
+    build:
+      context: ./forDatabaseDeploy
+      dockerfile: Dockerfile-alternate
+    volumes:
+      - "/home/theeska/postgres/:/var/lib/postgresql/ "
+    expose:
+      - "5432"
+    networks:
+      app_net:
+        ipv4_address: 172.18.238.10
+
+  go:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8989:8080"
+    depends_on:
+      - postgres
+    networks:
+      app_net:
+        ipv4_address: 172.18.238.9

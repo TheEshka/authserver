@@ -71,16 +71,16 @@ var defaultStandardMetrics = []prometheus.Collector{
 
 var routeUser = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
-		Name: "requests_to_route_user",
-		Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+		Name: "requests_to_route_USER",
+		Help: "How many HTTP requests processed on rouse /user, partitioned by status code and HTTP method.",
 	},
 	[]string{"code", "method"},
 )
 
 var routeAuth = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
-		Name: "requests_to_route_auth",
-		Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+		Name: "requests_to_route_AUTH",
+		Help: "How many HTTP requests processed on rouse /auth, partitioned by status code and HTTP method.",
 	},
 	[]string{"code", "method"},
 )
