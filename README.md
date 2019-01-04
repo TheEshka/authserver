@@ -2,7 +2,6 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/opensteel/authserver)](https://goreportcard.com/report/github.com/opensteel/authserver)
 
-Simple authorization server on GO
 Data is storing using PostgreSQL DBMS. To work correctly, the database "authdb" must have 2 tables:
 + access_control (user_type VARCHAR, access_mode INTEGER)
 + users (username, first_name, last_name, user_type, e_mail,  password VARCHAR, deleted BOOLEAN)
@@ -26,7 +25,7 @@ docker build -t goauth:1 .
 ```
 To run it you should write your darabase connection configuaration and publish port. For examaple:
 ```
-docker run -e DatabaseIp="172.17.0.3" -e  DatabaseUser="postgres"-e DatabasePassw="mysecret" -e DatabaseName="authdb"-e -p 9999:8080 -d goauth:1-t goauth:1 .
+docker run -e DatabaseIp="172.17.0.3" -e  DatabaseUser="postgres"-e DatabasePassw="mysecret" -e DatabaseName="authdb"-e -p 9999:8080 -d goauth:1
 ```
 (will start server on host 9999 port)
 
