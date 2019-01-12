@@ -6,6 +6,8 @@
 *.dylib
 *.log
 *.sql
+/pkg/tools/
+/cmd/cmd
 
 # Test binary, build with `go test -c`
 *.test

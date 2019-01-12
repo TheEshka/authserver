@@ -1,15 +1,18 @@
-FROM golang:1.10.7-alpine3.7
+FROM golang:1.10.7-alpine3.7 as build
 
-RUN mkdir -p "$GOPATH/src/github.com/opensteel/authserver"
-COPY ./ $GOPATH/src/github.com/opensteel/authserver
+WORKDIR /go/src/github.com/opensteel/authserver
+COPY . .
 
-RUN cd "$GOPATH/src/github.com/opensteel/authserver/cmd"; go build
+RUN cd "$GOPATH/src/github.com/opensteel/authserver/cmd"; go build -o myapp
 
-ENV DatabaseIp="172.18.238.10"
-ENV DatabasePassw="mysecret"
-ENV DatabaseName="authdb"
-ENV DatabaseUser="postgres"
-ENV ServerPort="8080"
+FROM alpine:latest as runner
+WORKDIR /root/
 
-WORKDIR "$GOPATH/src/github.com/opensteel/authserver/cmd"
-ENTRYPOINT exec ./cmd -db="user=$DatabaseUser password=$DatabasePassw host=$DatabaseIp dbname=$DatabaseName sslmode=disable" -port=":8989"
+COPY --from=build /go/src/github.com/opensteel/authserver/cmd/myapp . 
+
+ENV DATABASE_IP="127.0.0.1" \
+ DATABASE_PASSW="mysecret" \
+ DATABASE_NAME="authdb" \
+ DATABASE_USER="postgres"
+
+CMD exec ./myapp -db="user=$DATABASE_USER password=$DATABASE_PASSW host=$DATABASE_IP dbname=$DATABASE_NAME sslmode=disable" -port=":8989"

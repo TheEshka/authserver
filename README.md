@@ -21,11 +21,11 @@ If you want to connect to your own database, you can use only [Dockerfile](Docke
 ```
 git clone --branch first_branch https://github.com/opensteel/authserver
 cd authserver
-docker build -t goauth:1 .
+docker build --rm -t goauth:1 .
 ```
 To run it you should write your darabase connection configuaration and publish port. For examaple:
 ```
-docker run -e DatabaseIp="172.17.0.3" -e  DatabaseUser="postgres"-e DatabasePassw="mysecret" -e DatabaseName="authdb"-e -p 9999:8989 -d goauth:1
+docker run -e DatabaseIp="172.17.0.3" -e  DatabaseUser="postgres" -e DatabasePassw="mysecret" -e DatabaseName="authdb" -p 9999:8989 -d goauth:1
 ```
 (will start server on host 9999 port)
 

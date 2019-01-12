@@ -119,11 +119,7 @@ func deleteUser(m *model.Model) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"username":  json.Username,
-			"firstname": json.FisrtName,
-			"lastname":  json.LastName,
-			"usertype":  json.UserType,
-			"email":     json.EMail,
+			"username": json.Username,
 		})
 	}
 }
