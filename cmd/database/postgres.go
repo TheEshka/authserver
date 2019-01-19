@@ -3,6 +3,7 @@ package database
 import (
 	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"log"
 	"time"
@@ -95,6 +96,11 @@ func (p *pgDb) prepareSQLStatements() (err error) {
 }
 
 func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string) (*model.User, error) {
+	if _, err := base64.StdEncoding.DecodeString(password); err != nil {
+		log.Printf("CreateUser request error / %v", err)
+		return nil, model.ErrOnDatabase
+	}
+
 	passwSha256 := sha256.Sum256([]byte(password))
 	passwStr := hex.EncodeToString(passwSha256[:])
 	res, err := p.sqlInsertUser.Exec(username, fisrtName, lastName, eMail, passwStr)
@@ -116,6 +122,11 @@ func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string)
 }
 
 func (p *pgDb) VerifyUser(username, password, mode string) (*model.User, error) {
+	if _, err := base64.StdEncoding.DecodeString(password); err != nil {
+		log.Printf("VerifyUser request error / %v", err)
+		return nil, model.ErrOnDatabase
+	}
+
 	var err error
 	user := &model.User{}
 	passw := sha256.Sum256([]byte(password))
@@ -145,6 +156,11 @@ func (p *pgDb) VerifyUser(username, password, mode string) (*model.User, error) 
 }
 
 func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
+	if _, err := base64.StdEncoding.DecodeString(password); err != nil {
+		log.Printf("DeleteUser request error / %v", err)
+		return nil, model.ErrOnDatabase
+	}
+
 	passw := sha256.Sum256([]byte(password))
 	res, err := p.sqlInsertUser.Exec(username, hex.EncodeToString(passw[:]))
 	if err != nil {
@@ -164,6 +180,11 @@ func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 }
 
 func (p *pgDb) PatchUser(username, fisrtName, lastName, eMail, password string) (*model.User, error) {
+	if _, err := base64.StdEncoding.DecodeString(password); err != nil {
+		log.Printf("PatchUser request error / %v", err)
+		return nil, model.ErrOnDatabase
+	}
+
 	passw := sha256.Sum256([]byte(password))
 	res, err := p.sqlInsertUser.Exec(fisrtName, lastName, eMail, username, hex.EncodeToString(passw[:]))
 	if err != nil {
@@ -184,6 +205,11 @@ func (p *pgDb) PatchUser(username, fisrtName, lastName, eMail, password string) 
 }
 
 func (p *pgDb) GetUser(username, password, mode string) (*model.User, error) {
+	if _, err := base64.StdEncoding.DecodeString(password); err != nil {
+		log.Printf("GetUser request error / %v", err)
+		return nil, model.ErrOnDatabase
+	}
+
 	var err error
 	user := &model.User{}
 	passw := sha256.Sum256([]byte(password))

@@ -51,6 +51,10 @@ func createUser(m *model.Model) gin.HandlerFunc {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
+		case model.ErrPasswordFormat:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			log.Println(err)
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -82,6 +86,10 @@ func alterUser(m *model.Model) gin.HandlerFunc {
 			return
 		case model.ErrIncorrectInput:
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			log.Println(err)
+			return
+		case model.ErrPasswordFormat:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
 		}
@@ -116,6 +124,10 @@ func deleteUser(m *model.Model) gin.HandlerFunc {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
+		case model.ErrPasswordFormat:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			log.Println(err)
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -147,6 +159,10 @@ func verifyUser(m *model.Model) gin.HandlerFunc {
 			return
 		case model.ErrIncorrectInput:
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			log.Println(err)
+			return
+		case model.ErrPasswordFormat:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
 		}
@@ -185,6 +201,10 @@ func getUser(m *model.Model) gin.HandlerFunc {
 			return
 		case model.ErrIncorrectInput:
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			log.Println(err)
+			return
+		case model.ErrPasswordFormat:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
 		}
