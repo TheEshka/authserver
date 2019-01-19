@@ -13,20 +13,14 @@ import (
 func Start(m *model.Model, listenPort string, p *middleware.Prometheus) {
 	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-
 	p.Use(r)
 
 	r.POST("/user", createUser(m))
-
 	r.PATCH("/user", alterUser(m))
-
 	r.DELETE("/user", deleteUser(m))
-
 	r.GET("/user", getUser(m))
 
 	r.POST("/auth", verifyUser(m))
-
-	//r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	r.Run(listenPort)
 }
