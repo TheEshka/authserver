@@ -6,8 +6,6 @@ services:
     build:
       context: ./forDatabaseDeploy
       dockerfile: Dockerfile
-    volumes:
-      - "/home/theeska/postgres/:/var/lib/postgresql/ "
     expose:
       - "5432"
 
