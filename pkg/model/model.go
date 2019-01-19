@@ -23,7 +23,7 @@ var ErrOnDatabase = errors.New("Database connection error")
 var ErrIncorrectInput = errors.New("Incorrect username/email or password")
 
 //ErrAleadyExist : request doesn't change anything in database since there are already exist the ecludind record
-var ErrAleadyExist = errors.New("User with this username/email already exist")
+var ErrAlreadyExist = errors.New("User with this username/email already exist")
 
 //ErrAleadyExist : request doesn't change anything in database since there are already exist the ecludind record
 var ErrPasswordFormat = errors.New("Password must be in base64 format")

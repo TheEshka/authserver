@@ -41,8 +41,8 @@ func createUser(m *model.Model) gin.HandlerFunc {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
-		case model.ErrAleadyExist:
-			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		case model.ErrAlreadyExist:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			log.Println(err)
 			return
 		case model.ErrPasswordFormat:
