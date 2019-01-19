@@ -58,40 +58,35 @@ type pgDb struct {
 }
 
 func (p *pgDb) prepareSQLStatements() (err error) {
-	if p.sqlVerifyByUsername, err = p.dbConn.Prepare(
-		"SELECT username, first_name, last_name, user_type, e_mail FROM users WHERE username=$1 AND " +
-			"password=$2 AND deleted=FALSE",
-	); err != nil {
+	request := "SELECT username, first_name, last_name, user_type, e_mail FROM users WHERE username=$1 AND " +
+		"password=$2 AND deleted=FALSE"
+	if p.sqlVerifyByUsername, err = p.dbConn.Prepare(request); err != nil {
 		log.Printf("Error preparing sqlVerifyByUsername: %v", err)
 		return err
 	}
 
-	if p.sqlVerifyByEmail, err = p.dbConn.Prepare(
-		"SELECT username, first_name, last_name, user_type, e_mail FROM users WHERE e_mail=$1 AND " +
-			"password=$2 AND deleted=FALSE",
-	); err != nil {
+	request = "SELECT username, first_name, last_name, user_type, e_mail FROM users WHERE e_mail=$1 AND " +
+		"password=$2 AND deleted=FALSE"
+	if p.sqlVerifyByEmail, err = p.dbConn.Prepare(request); err != nil {
 		log.Printf("Error preparing sqlVerifyByEmail: %v", err)
 		return err
 	}
 
-	if p.sqlInsertUser, err = p.dbConn.Prepare(
-		"INSERT INTO users (username, first_name, last_name, e_mail ,password)" +
-			"values ($1,$2,$3,$4,$5);",
-	); err != nil {
+	request = "INSERT INTO users (username, first_name, last_name, e_mail ,password)" +
+		"values ($1,$2,$3,$4,$5);"
+	if p.sqlInsertUser, err = p.dbConn.Prepare(request); err != nil {
 		log.Printf("Error preparing sqlInsertUser: %v", err)
 		return err
 	}
 
-	if p.sqlDeleteMarkUser, err = p.dbConn.Prepare(
-		"UPDATE USERS SET DELETED = '1' WHERE username=$1 AND password=$2 AND DELETED=FALSE",
-	); err != nil {
+	request = "UPDATE USERS SET DELETED = '1' WHERE username=$1 AND password=$2 AND DELETED=FALSE"
+	if p.sqlDeleteMarkUser, err = p.dbConn.Prepare(request); err != nil {
 		log.Printf("Error preparing sqlDeleteMarkUser: %v", err)
 		return err
 	}
 
-	if p.sqlPatchUser, err = p.dbConn.Prepare(
-		"UPDATE USERS SET first_name=$1, last_name=$2, e_mail=$3 WHERE username=$4 AND password=$5 AND DELETED=FALSE",
-	); err != nil {
+	request = "UPDATE USERS SET first_name=$1, last_name=$2, e_mail=$3 WHERE username=$4 AND password=$5 AND DELETED=FALSE"
+	if p.sqlPatchUser, err = p.dbConn.Prepare(request); err != nil {
 		log.Printf("Error preparing sqlPatchUser: %v", err)
 		return err
 	}
