@@ -15,4 +15,4 @@ ENV DATABASE_IP="127.0.0.1" \
  DATABASE_NAME="authdb" \
  DATABASE_USER="postgres"
 
-CMD exec ./myapp -db="user=$DATABASE_USER password=$DATABASE_PASSW host=$DATABASE_IP dbname=$DATABASE_NAME sslmode=disable" -port=":8989"
+CMD exec ./myapp -db="user=$DATABASE_USER password=$DATABASE_PASSW host=$DATABASE_IP dbname=$DATABASE_NAME sslmode=disable" -port=":8080"
