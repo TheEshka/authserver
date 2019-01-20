@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"log"
-	"time"
 
 	"github.com/opensteel/authserver/pkg/model"
 	//init database drive
@@ -22,22 +21,13 @@ type Config struct {
 func InitDb(cfg Config) (*pgDb, error) {
 	var dbConn *sql.DB
 	var err error
-	for i := 0; ; {
-		i++
-		dbConn, err = sql.Open("postgres", cfg.ConnectString)
-		if err != nil {
-			log.Println("Database connecting error")
-			if i == 20 {
-				return nil, err
-			}
-			time.Sleep(time.Second * 5)
-		}
-		break
-	}
+
+	dbConn, err = sql.Open("postgres", cfg.ConnectString)
 	if err != nil {
 		log.Println("Database connecting error")
 		return nil, err
 	}
+
 	p := &pgDb{dbConn: dbConn}
 	err = p.prepareSQLStatements()
 	if err != nil {
@@ -111,7 +101,7 @@ func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string)
 			return nil, model.ErrOnDatabase
 		}
 		log.Printf("CreateUser : incorrect request to database")
-		return nil, model.ErrAleadyExist
+		return nil, model.ErrAlreadyExist
 	}
 
 	res.LastInsertId() //stub
@@ -162,7 +152,7 @@ func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 	}
 
 	passw := sha256.Sum256([]byte(password))
-	res, err := p.sqlInsertUser.Exec(username, hex.EncodeToString(passw[:]))
+	res, err := p.sqlDeleteMarkUser.Exec(username, hex.EncodeToString(passw[:]))
 	if err != nil {
 		log.Printf("DeleteUser : Error on database %v", err)
 		return nil, model.ErrOnDatabase
@@ -172,7 +162,7 @@ func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 	switch i {
 	case 0:
 		log.Printf("DeleteUser : 0 rows changed")
-		return nil, model.ErrAleadyExist
+		return nil, model.ErrAlreadyExist
 	default:
 		log.Printf("DeleteUser : deleted user %s", username)
 		return &model.User{Username: username}, nil
@@ -186,7 +176,7 @@ func (p *pgDb) PatchUser(username, fisrtName, lastName, eMail, password string) 
 	}
 
 	passw := sha256.Sum256([]byte(password))
-	res, err := p.sqlInsertUser.Exec(fisrtName, lastName, eMail, username, hex.EncodeToString(passw[:]))
+	res, err := p.sqlPatchUser.Exec(fisrtName, lastName, eMail, username, hex.EncodeToString(passw[:]))
 	if err != nil {
 		log.Printf("PatchUser : database error: %v", err)
 		return nil, model.ErrOnDatabase
