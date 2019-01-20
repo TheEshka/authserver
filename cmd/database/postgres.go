@@ -7,7 +7,9 @@ import (
 	"encoding/hex"
 	"log"
 
+	"github.com/lib/pq"
 	"github.com/opensteel/authserver/pkg/model"
+
 	//init database drive
 	_ "github.com/lib/pq"
 )
@@ -93,18 +95,20 @@ func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string)
 
 	passwSha256 := sha256.Sum256([]byte(password))
 	passwStr := hex.EncodeToString(passwSha256[:])
-	res, err := p.sqlInsertUser.Exec(username, fisrtName, lastName, eMail, passwStr)
+	_, err := p.sqlInsertUser.Exec(username, fisrtName, lastName, eMail, passwStr)
 	if err != nil {
-		err = p.dbConn.Ping()
-		if err != nil {
-			log.Printf("CreateUser database connection error / %v", err)
-			return nil, model.ErrOnDatabase
+		errpq, ok := err.(*pq.Error)
+		if ok {
+			switch errpq.Code.Name() {
+			case "unique_violation":
+				log.Println("CreateUser : incorrect request to database. pq error:", errpq.Code.Name())
+				return nil, model.ErrAlreadyExist
+			}
 		}
-		log.Printf("CreateUser : incorrect request to database")
-		return nil, model.ErrAlreadyExist
+		log.Printf("CreateUser database connection error / %v", err)
+		return nil, model.ErrOnDatabase
 	}
 
-	res.LastInsertId() //stub
 	log.Printf("CreateUser : created user %s", username)
 	q := &model.User{Username: username, FisrtName: fisrtName, LastName: lastName, UserType: "general", EMail: eMail}
 	return q, nil
@@ -162,7 +166,7 @@ func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 	switch i {
 	case 0:
 		log.Printf("DeleteUser : 0 rows changed")
-		return nil, model.ErrAlreadyExist
+		return nil, model.ErrIncorrectInput
 	default:
 		log.Printf("DeleteUser : deleted user %s", username)
 		return &model.User{Username: username}, nil
