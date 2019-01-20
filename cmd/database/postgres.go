@@ -111,7 +111,7 @@ func (p *pgDb) CreateUser(username, fisrtName, lastName, eMail, password string)
 			return nil, model.ErrOnDatabase
 		}
 		log.Printf("CreateUser : incorrect request to database")
-		return nil, model.ErrAleadyExist
+		return nil, model.ErrAlreadyExist
 	}
 
 	res.LastInsertId() //stub
@@ -172,7 +172,7 @@ func (p *pgDb) DeleteUser(username, password string) (*model.User, error) {
 	switch i {
 	case 0:
 		log.Printf("DeleteUser : 0 rows changed")
-		return nil, model.ErrAleadyExist
+		return nil, model.ErrIncorrectInput
 	default:
 		log.Printf("DeleteUser : deleted user %s", username)
 		return &model.User{Username: username}, nil
