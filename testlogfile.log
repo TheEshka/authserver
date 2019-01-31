@@ -1,5 +1,0 @@
-2018/12/25 01:25:37 Autorization server on port :8080 started
-2018/12/25 01:25:37 Database connected successful
-2018/12/25 01:25:47 CheckUser: Error in QueryRow
-2018/12/25 01:25:50 CheckUser: Username is alex
-2018/12/25 01:25:50 <nil>
