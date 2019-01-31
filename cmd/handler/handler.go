@@ -11,9 +11,15 @@ import (
 
 //Start :
 func Start(m *model.Model, listenPort string, p *middleware.Prometheus) {
+
+	r := setupRoute(m)
+	p.Use(r)
+	r.Run(listenPort)
+}
+
+func setupRoute(m *model.Model) *gin.Engine {
 	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	p.Use(r)
 
 	r.POST("/user", createUser(m))
 	r.PATCH("/user", alterUser(m))
@@ -21,8 +27,7 @@ func Start(m *model.Model, listenPort string, p *middleware.Prometheus) {
 	r.GET("/user", getUser(m))
 
 	r.POST("/auth", verifyUser(m))
-
-	r.Run(listenPort)
+	return r
 }
 
 func createUser(m *model.Model) gin.HandlerFunc {
